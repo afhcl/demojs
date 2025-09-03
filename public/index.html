@@ -4,17 +4,32 @@
   <meta charset="UTF-8" />
   <title>Create Opportunity</title>
   <script>
+    function escapeHtml(str) {
+      return str.replace(/[&<>'"/]/g, function(c) {
+        switch (c) {
+          case '&': return '&amp;';
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '"': return '&quot;';
+          case "'": return '&#039;';
+          case '/': return '&#x2F;';
+        }
+      });
+    }
     async function previewOpportunity() {
       const res = await fetch('/preview', { method: 'POST' });
       const data = await res.json();
       if (res.ok) {
         document.getElementById('preview').innerHTML = `
           <h3>Preview</h3>
-          <p><strong>Name:</strong> ${data.name}</p>
-          <p><strong>Value:</strong> $${data.estimatedvalue}</p>
-          <p><strong>Close Date:</strong> ${data.estimatedclosedate}</p>
-          <p><strong>Participant:</strong> ${data.participant}</p>
+          <p><strong>Name:</strong> ${escapeHtml(data.name)}</p>
+          <p><strong>Value:</strong> $${escapeHtml(data.estimatedvalue)}</p>
+          <p><strong>Close Date:</strong> ${escapeHtml(data.estimatedclosedate)}</p>
+          <p><strong>Participant:</strong> ${escapeHtml(data.participant)}</p>
         `;
+      }
+    }
+  </script>
         window.previewData = data;
       } else {
         alert(data.error);
