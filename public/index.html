@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Opportunity</title>
+  <script>
+    async function previewOpportunity() {
+      const res = await fetch('/preview', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('preview').innerHTML = `
+          <h3>Preview</h3>
+          <p><strong>Name:</strong> ${data.name}</p>
+          <p><strong>Value:</strong> $${data.estimatedvalue}</p>
+          <p><strong>Close Date:</strong> ${data.estimatedclosedate}</p>
+          <p><strong>Participant:</strong> ${data.participant}</p>
+        `;
+        window.previewData = data;
+      } else {
+        alert(data.error);
+      }
+    }
+
+    async function submitOpportunity() {
+      if (!window.previewData) return alert('Please preview first.');
+      const res = await fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ participant: window.previewData.participant }),
+      });
+      const data = await res.json();
+      alert(data.message || data.error);
+    }
+  </script>
+</head>
+<body>
+  <h1>Create Opportunity from Calendar</h1>
+  <button onclick="previewOpportunity()">Preview</button>
+  <button onclick="submitOpportunity()">Submit</button>
+  <div id="preview" style="margin-top: 20px;"></div>
+</body>
+</html>
+
