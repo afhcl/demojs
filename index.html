@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Opportunity Creator</title>
+</head>
+<body>
+  <h1>Create Opportunity from Calendar</h1>
+  <button onclick="previewOpportunity()">Preview</button>
+  <button onclick="submitOpportunity()">Submit</button>
+
+  <div id="preview"></div>
+
+  <script>
+    async function previewOpportunity() {
+      const res = await fetch('/preview');
+      const data = await res.json();
+      document.getElementById('preview').innerHTML = `
+        <h3>Opportunity Preview</h3>
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Amount:</strong> \$${data.amount}</p>
+        <p><strong>Close Date:</strong> ${data.closeDate}</p>
+        <p><strong>Participants:</strong> ${data.participants.join(', ')}</p>
+      `;
+    }
+
+    async function submitOpportunity() {
+      const res = await fetch('/submit', { method: 'POST' });
+      const result = await res.json();
+      alert(result.success ? 'Opportunity created!' : 'Failed to create opportunity');
+    }
+  </script>
+</body>
+</html>
+
