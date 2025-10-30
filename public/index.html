@@ -1,58 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Create Opportunity</title>
-  <script>
-    function escapeHtml(str) {
-      return str.replace(/[&<>'"/]/g, function(c) {
-        switch (c) {
-          case '&': return '&amp;';
-          case '<': return '&lt;';
-          case '>': return '&gt;';
-          case '"': return '&quot;';
-          case "'": return '&#039;';
-          case '/': return '&#x2F;';
-        }
-      });
-    }
-    async function previewOpportunity() {
-      const res = await fetch('/preview', { method: 'POST' });
-      const data = await res.json();
-      if (res.ok) {
-        document.getElementById('preview').innerHTML = `
-          <h3>Preview</h3>
-          <p><strong>Name:</strong> ${escapeHtml(data.name)}</p>
-          <p><strong>Value:</strong> $${escapeHtml(data.estimatedvalue)}</p>
-          <p><strong>Close Date:</strong> ${escapeHtml(data.estimatedclosedate)}</p>
-          <p><strong>Participant:</strong> ${escapeHtml(data.participant)}</p>
-        `;
-      }
-    }
-  </script>
-        window.previewData = data;
-      } else {
-        alert(data.error);
-      }
-    }
-
-    async function submitOpportunity() {
-      if (!window.previewData) return alert('Please preview first.');
-      const res = await fetch('/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ participant: window.previewData.participant }),
-      });
-      const data = await res.json();
-      alert(data.message || data.error);
-    }
-  </script>
+  <meta charset="UTF-8">
+  <title>Opportunity Creator</title>
 </head>
 <body>
   <h1>Create Opportunity from Calendar</h1>
   <button onclick="previewOpportunity()">Preview</button>
   <button onclick="submitOpportunity()">Submit</button>
-  <div id="preview" style="margin-top: 20px;"></div>
+
+  <div id="preview"></div>
+
+  <script>
+    async function previewOpportunity() {
+      const res = await fetch('/preview');
+      const data = await res.json();
+      document.getElementById('preview').innerHTML = `
+        <h3>Opportunity Preview</h3>
+        <p><strong>Name:</strong> ${data.name}</p>
+        <p><strong>Amount:</strong> \$${data.amount}</p>
+        <p><strong>Close Date:</strong> ${data.closeDate}</p>
+        <p><strong>Participants:</strong> ${data.participants.join(', ')}</p>
+      `;
+    }
+
+    async function submitOpportunity() {
+      const res = await fetch('/submit', { method: 'POST' });
+      const result = await res.json();
+      alert(result.success ? 'Opportunity created!' : 'Failed to create opportunity');
+    }
+  </script>
 </body>
 </html>
 
